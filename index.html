@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400&display=swap" rel="stylesheet">
+		<title>Simple CSV</title>
+		<meta name="description" content="A simple and lightweight GUI to the Torrent-CSV API">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="shortcut icon" href="favicon.ico">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<style type="text/css" media="screen">
+			* {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				box-sizing: border-box;
+				font-family: "IBM Plex Sans", sans-serif;
+				font-optical-sizing: auto;				
+				color: #e0e0e0;
+			}
+			html {
+				-webkit-text-size-adjust: 100%;				
+			}
+			body {
+				background-color: #171717;
+			}
+			header {
+				text-align: center;
+				margin: 2rem 1rem 4rem 1rem;
+			}
+			img {
+				width: 64px;
+			}
+			input, button {
+				height: 2rem;
+				padding: 0 1rem;
+				margin: 0.5rem 0;
+				border-radius: 4px;
+				background-color: #282828;
+				font-size: 1.1rem;
+				height: 40px;				
+			}
+			input {
+				width: 100%;
+				max-width: 520px;
+			}
+			button {
+				cursor: pointer;
+				width: 150px;
+			}
+			#list {
+				background-color: #1d1d1d;
+			}
+			ol {
+				list-style: none;
+			}
+			ol > li {
+				padding: 1rem;
+				border-top: 1px dashed #333;
+				overflow-wrap: break-word;
+				min-width: 320px;
+			}
+			ol > li:last-child {
+				border-bottom: 1px dashed #333;
+			}
+			p {
+				font-size: 1.1rem;
+			}
+			p.msg {
+				text-align: center;
+				padding: 2rem;
+			}
+			ul {
+				margin-top: 0.5rem;
+			}
+			ul > li {
+				list-style: none;
+				font-size: 0.9rem;
+				display: inline;
+				margin-right: 1rem;
+			}
+			footer {
+				padding: 2rem 1rem;
+				color: #666;
+				text-align: center;
+			}
+			footer > a {
+				color: #666;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<a href="/csv/"><img src="logo.png"></a>
+			<form>
+				<input type="text" name="q" /><br />
+				<button type="submit">Search</button>
+			</form>
+		</header>
+
+		<div id="list"></div>
+
+		<script type="text/javascript">
+
+// BUILD THE URL FOR SEARCH, PAGINATION, AND LISTING
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+
+			if (urlParams.has('q')) {
+				var url = "https://torrents-csv.com/service/search?q=" + urlParams.get('q');
+
+// FETCH THE JSON FROM THE URL
+				fetch(url)
+					.then(response => response.json())
+					.then(json => {
+
+						if (json.torrents.length) {						
+
+							var content_list = "<ol>";
+
+							for (let i = 0, j = 0; i < json.torrents.length && j < 24; i++, j++) {
+
+								content_list += "<li>";
+
+									content_list += "<p><a href='magnet:?xt=urn:btih:" + json.torrents[i].infohash + "&dn=" + json.torrents[i].name + "&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dump.cl%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=http%3A%2F%2Fwww.torrentsnipe.info%3A2701%2Fannounce&tr=http%3A%2F%2Fwww.genesis-sp.org%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker810.xyz%3A11450%2Fannounce&tr=http%3A%2F%2Ftracker.xiaoduola.xyz%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.skyts.net%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.sbsub.com%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.moxing.party%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.lintk.me%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.ipv6tracker.org%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.dmcomic.org%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.corpscorp.online%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.bz%3A80%2Fannounce'>" + json.torrents[i].name + "</a></p>";
+
+									content_list += "<ul>";
+
+										content_list += "<li>" + json.torrents[i].seeders + " Seeders</li>";
+
+										content_list += "<li>" + json.torrents[i].leechers + " Leechers</li>";
+
+										content_list += "<li>" + ((json.torrents[i].size_bytes)/1073741824).toFixed(2) + " GB</li>";
+
+									content_list += "</ul>";
+
+								content_list += "</li>";
+							}
+
+							content_list += "</ol>";
+
+							if(json.torrents.length < 24)
+								var footer_list = json.torrents.length + " result(s) from <a href='https://torrents-csv.com/'>Torrents-CSV</a>";
+							else
+								var footer_list = "24 results from <a href='https://torrents-csv.com/'>Torrents-CSV</a>";
+
+						}
+
+// NO RESULTS
+						else {
+
+							var content_list = "<p class='msg'>No Results</p>";
+
+							var footer_list = "0 results from <a href='https://torrents-csv.com/'>Torrents-CSV</a>";
+
+						}
+
+// RENDER THE HTML CONTENT
+						document.getElementById("list").innerHTML = content_list;
+
+						document.getElementById("footer").innerHTML = footer_list;
+
+					})
+
+// MANAGE FETCH ERRORS
+					.catch((error) => {
+
+						var content_list = "<p class='msg'>ERROR<br /><br />Couldn't fetch data from the API</p>";
+					document.getElementById("list").innerHTML = content_list;
+
+					})
+			}
+		</script>
+
+		<footer id="footer"></footer>
+	</body>
+</html>
